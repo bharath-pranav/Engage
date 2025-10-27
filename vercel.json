@@ -1,0 +1,15 @@
+{
+  "name": "thrive-chat",
+  "version": 2,
+  "buildCommand": "npm run build:client",
+  "outputDirectory": "dist/public",
+  "devCommand": "npm run client:dev",
+  "installCommand": "npm install",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+} 
