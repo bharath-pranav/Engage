@@ -42,14 +42,26 @@ export function FormattedMessage({ text, isUser }: FormattedMessageProps) {
         return;
       }
 
-      // Handle numbered lists
+      // Handle numbered lists (with special highlighting for manager names)
       const numberedListMatch = line.match(/^(\d+)\.\s+(.+)/);
       if (numberedListMatch) {
         const [, number, content] = numberedListMatch;
+        
+        // Check if this is a manager performance line (contains manager name and percentage)
+        const managerMatch = content.match(/^([^:]+):\s*(.+)/);
+        
         elements.push(
-          <div key={index} className="my-1">
+          <div key={index} className="my-2">
             <span className="font-semibold text-gray-700 dark:text-gray-300">{number}. </span>
-            <span>{formatInlineText(content)}</span>
+            {managerMatch ? (
+              <>
+                <span className="font-bold text-teal-600 dark:text-teal-400">{managerMatch[1]}</span>
+                <span>: </span>
+                <span>{formatInlineText(managerMatch[2])}</span>
+              </>
+            ) : (
+              <span>{formatInlineText(content)}</span>
+            )}
           </div>
         );
         return;
@@ -127,6 +139,32 @@ export function FormattedMessage({ text, isUser }: FormattedMessageProps) {
           }
           return boldPart;
         });
+      }
+      
+      // Highlight percentages with color coding
+      const percentageMatch = part.match(/\((\d+(?:\.\d+)?%)\)/);
+      if (percentageMatch) {
+        const percentage = parseFloat(percentageMatch[1]);
+        let colorClass = 'text-gray-700 dark:text-gray-300';
+        
+        // Color code based on percentage ranges
+        if (percentage >= 80) {
+          colorClass = 'text-green-600 dark:text-green-400 font-semibold';
+        } else if (percentage >= 60) {
+          colorClass = 'text-blue-600 dark:text-blue-400 font-semibold';
+        } else if (percentage >= 40) {
+          colorClass = 'text-yellow-600 dark:text-yellow-400 font-semibold';
+        } else {
+          colorClass = 'text-red-600 dark:text-red-400 font-semibold';
+        }
+        
+        return (
+          <span key={index}>
+            {part.substring(0, percentageMatch.index)}
+            <span className={colorClass}>{percentageMatch[0]}</span>
+            {part.substring((percentageMatch.index || 0) + percentageMatch[0].length)}
+          </span>
+        );
       }
       
       return part;

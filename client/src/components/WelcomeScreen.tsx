@@ -35,21 +35,21 @@ export default function WelcomeScreen({ onSelectOption }: WelcomeScreenProps) {
   const optionCards = [
     {
       icon: kudosIcon,
-      title: "Tell about kudos",
-      subtitle: "in thrive sparrow",
-      text: "Tell me about kudos in thrive sparrow"
+      title: "Which managers have highest engagement scores?",
+      subtitle: "Which managers have highest engagement scores?",
+      text: "Which managers have highest engagement scores?"
     },
     {
       icon: surveyIcon,
-      title: "What is survey",
-      subtitle: "Highlights",
-      text: "What is survey Highlights?"
+      title: "Tell me under which manager employees are performing better",
+      subtitle: "Tell me under which manager employees are performing better",
+      text: "Tell me under which manager employees are performing better"
     },
     {
       icon: responseIcon,
-      title: "What is Engage & Pulse",
-      subtitle: "Surveys",
-      text: "What is Engage & Pulse Surveys?"
+      title: "Tell me under which manager employees are performing better",
+      subtitle: "Tell me under which manager employees are performing better",
+      text: "Tell me under which manager employees are performing better"
     }
   ];
 
