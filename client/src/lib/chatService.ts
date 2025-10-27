@@ -1,4 +1,5 @@
-interface EngageAgentResponse {
+// Response can be either wrapped (from Lambda) or direct (from API Gateway)
+interface EngageAgentWrappedResponse {
   statusCode: number;
   headers: {
     "Content-Type": string;
@@ -6,24 +7,28 @@ interface EngageAgentResponse {
     "Access-Control-Allow-Methods": string;
     "Access-Control-Allow-Headers": string;
   };
-  body: {
-    status: string;
-    requestId: string;
-    sessionId: string;
-    response: string;
-    metadata: {
-      tokenUsage: {
-        prompt: number;
-        completion: number;
-        total: number;
-      };
-      actionGroupsInvoked: string[];
-      surveyDataUrl: string;
-      originalQuestion: string;
-      enhancedQuestion: string;
+  body: string | EngageAgentDirectResponse;
+}
+
+interface EngageAgentDirectResponse {
+  status: string;
+  requestId?: string;
+  sessionId: string;
+  response: string;
+  metadata: {
+    tokenUsage: {
+      prompt: number;
+      completion: number;
+      total: number;
     };
+    actionGroupsInvoked: string[];
+    surveyDataUrl: string;
+    originalQuestion: string;
+    enhancedQuestion: string;
   };
 }
+
+type EngageAgentResponse = EngageAgentWrappedResponse | EngageAgentDirectResponse;
 
 export class ChatService {
   private static readonly API_BASE_URL = 'https://wu7l7mf52es4d7rm6l6qdxhghm0berjj.lambda-url.us-west-2.on.aws';
@@ -59,14 +64,28 @@ export class ChatService {
 
       const data: EngageAgentResponse = await response.json();
 
+      // Parse the response - handle both wrapped and direct formats
+      let parsedData: EngageAgentDirectResponse;
+
+      if ('statusCode' in data) {
+        // Wrapped response from Lambda
+        const bodyContent = typeof data.body === 'string' 
+          ? JSON.parse(data.body) 
+          : data.body;
+        parsedData = bodyContent;
+      } else {
+        // Direct response from API Gateway
+        parsedData = data as EngageAgentDirectResponse;
+      }
+
       // Check if the response is successful
-      if (data.body.status !== 'success') {
+      if (parsedData.status !== 'success') {
         throw new Error('Failed to get response from engage agent');
       }
 
       return {
-        answer: data.body.response,
-        sessionId: data.body.sessionId,
+        answer: parsedData.response,
+        sessionId: parsedData.sessionId,
         shouldCreateNewChat: false
       };
     } catch (error) {

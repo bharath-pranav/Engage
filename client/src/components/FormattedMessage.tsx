@@ -55,12 +55,15 @@ export function FormattedMessage({ text, isUser }: FormattedMessageProps) {
         return;
       }
 
-      // Handle bullet points and dashes
-      const bulletMatch = line.match(/^[-•]\s+(.+)/);
+      // Handle bullet points and dashes (including nested ones with indentation)
+      const bulletMatch = line.match(/^(\s*)[-•]\s+(.+)/);
       if (bulletMatch) {
-        const [, content] = bulletMatch;
+        const [, indent, content] = bulletMatch;
+        const indentLevel = Math.floor(indent.length / 2); // 2 spaces = 1 indent level
+        const marginLeft = indentLevel > 0 ? `${indentLevel * 1.5}rem` : '0.5rem';
+        
         elements.push(
-          <div key={index} className="my-1 ml-2">
+          <div key={index} className="my-1" style={{ marginLeft }}>
             <span className="text-gray-600 dark:text-gray-400 mr-2">•</span>
             <span>{formatInlineText(content)}</span>
           </div>
