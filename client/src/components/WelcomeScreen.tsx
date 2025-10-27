@@ -37,7 +37,7 @@ export default function WelcomeScreen({ onSelectOption }: WelcomeScreenProps) {
       icon: kudosIcon,
       title: "Which managers have highest engagement scores?",
       subtitle: "",
-      text: ""
+      text: "Which managers have highest engagement scores?"
     },
     {
       icon: surveyIcon,
